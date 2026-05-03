@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --bg: #f5f7fa; --bot-bubble: #e9e9eb; --user-bubble: #dcf8c6; --accent: #0088cc; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        #chat-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 12px; border-radius: 15px; max-width: 85%; font-size: 15px; line-height: 1.4; }
+        .bot { background: var(--bot-bubble); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: var(--user-bubble); align-self: flex-end; border-bottom-right-radius: 2px; }
+        .explanation { font-size: 0.9em; color: #444; border-top: 1px solid #ccc; margin-top: 8px; padding-top: 8px; }
+        #input-area { padding: 10px; background: white; display: flex; gap: 8px; border-top: 1px solid #ddd; }
+        input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
+        button { background: var(--accent); color: white; border: none; padding: 0 15px; border-radius: 20px; font-weight: bold; }
+        input:disabled { background: #eee; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div id="chat-container"></div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Ask about the grammar...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready(); tg.expand();
+        
+        const params = new URLSearchParams(window.location.search);
+        let messageCount = 0;
+        const chat = document.getElementById('chat-container');
+
+        // Initial setup from URL params
+        function init() {
+            addBubble("bot", `<b>Context:</b><br>${params.get('bot_msg')}`);
+            addBubble("user", `<b>Your answer:</b><br>${params.get('user_msg')}<br><br><b>Correction:</b><br>${params.get('correction')}`);
+            getInitialExplanation();
+        }
+
+        function addBubble(role, text) {
+            const div = document.createElement('div');
+            div.className = `bubble ${role}`;
+            div.innerHTML = text;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function getInitialExplanation() {
+            // Call API for the initial grammatical breakdown
+            const prompt = `Explain the grammar mistakes in this sentence: "${params.get('user_msg')}" vs "${params.get('correction')}". Use the language of the user. Only discuss grammar.`;
+            const reply = await callAI(prompt);
+            addBubble("bot", reply);
+        }
+
+        async function sendMessage() {
+            if (messageCount >= 10) return;
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addBubble("user", text);
+            input.value = "";
+            messageCount++;
+
+            if (messageCount >= 10) {
+                input.disabled = true;
+                addBubble("bot", "⚠️ Message limit reached. Please return to the main chat.");
+                return;
+            }
+
+            const reply = await callAI(`The user asks: "${text}". Strictly answer only regarding the grammar of the previous correction. Ignore off-topic.`);
+            addBubble("bot", reply);
+        }
+
+        async function callAI(content) {
+            const response = await fetch("https://llm-ai.hopto.org/v1/chat/completions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": "Bearer sk-5lmG4iJ6dGdaXdgm4Z6zBSXXnd3MWXBvOnXIXSIWNtaQ53jG" },
+                body: JSON.stringify({
+                    model: "gpt-5.4",
+                    messages: [{ role: "system", content: "You are a strict grammar assistant. Only discuss linguistic structure and grammar. Do not engage in small talk." }, { role: "user", content }]
+                })
+            });
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        init();
+    </script>
+</body>
+</html>
