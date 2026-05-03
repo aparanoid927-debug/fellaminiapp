@@ -2,55 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: var(--tg-theme-bg-color, #ffffff);
-            --text: var(--tg-theme-text-color, #000000);
-            --sec-bg: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            --hint: var(--tg-theme-hint-color, #999999);
+            --bg: var(--tg-theme-bg-color, #f5f7fa);
+            --text: var(--tg-theme-text-color, #1a1a1a);
+            --sec-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --accent: var(--tg-theme-button-color, #0088cc);
+            --accent-text: var(--tg-theme-button-text-color, #ffffff);
+            --hint: var(--tg-theme-hint-color, #707579);
         }
-        body { font-family: sans-serif; padding: 15px; background: var(--bg); color: var(--text); margin: 0; }
-        #transcript { line-height: 1.6; margin-bottom: 100px; font-size: 1.1em; }
-        .word { cursor: pointer; display: inline-block; padding: 2px 4px; border-radius: 4px; }
-        .word:active { background: var(--sec-bg); }
-        
-        #controls { position: sticky; top: 0; background: var(--bg); padding-bottom: 10px; border-bottom: 1px solid var(--sec-bg); margin-bottom: 15px; }
-        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--hint); background: var(--sec-bg); color: var(--text); }
-        
-        #translation-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; background: var(--sec-bg); border-top: 1px solid var(--hint); box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-        #res-word { font-weight: bold; color: var(--hint); display: block; margin-bottom: 5px; font-size: 0.9em; }
-        #res-trans { font-size: 1.2em; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        #controls { margin-bottom: 24px; }
+        select { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: var(--sec-bg); color: var(--text); font-size: 16px; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        #transcript { flex-grow: 1; line-height: 1.6; font-size: 1.2em; letter-spacing: 0.2px; margin-bottom: 140px; }
+        .word { cursor: pointer; display: inline-block; padding: 2px 6px; margin: 1px; border-radius: 6px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .word:active { background: var(--accent); color: var(--accent-text); transform: scale(0.95); }
+        #translation-footer { position: fixed; bottom: 16px; left: 16px; right: 16px; padding: 20px; background: var(--sec-bg); border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
+        #res-word { font-weight: 600; color: var(--hint); display: block; margin-bottom: 8px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+        #res-trans { font-size: 1.3em; font-weight: 500; color: var(--accent); }
     </style>
 </head>
 <body>
     <div id="controls">
         <select id="lang-select">
-            <option value="ru">Russian</option>
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="de">German</option>
+            <option value="ru">🇷🇺 Russian</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Spanish</option>
+            <option value="de">🇩🇪 German</option>
         </select>
     </div>
-
     <div id="transcript"></div>
-
     <div id="translation-footer">
-        <span id="res-word">Tap a word...</span>
+        <span id="res-word">Tap to translate</span>
         <div id="res-trans">—</div>
     </div>
-
     <script>
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
+        tg.ready(); tg.expand();
         const urlParams = new URLSearchParams(window.location.search);
         const rawText = urlParams.get('text') || "";
         const transcriptDiv = document.getElementById('transcript');
-
-        // Split text into interactive words
         rawText.split(/\s+/).forEach(word => {
             const cleanWord = word.replace(/[.,!?;:()]/g, "");
             const span = document.createElement('span');
@@ -60,22 +53,16 @@
             transcriptDiv.appendChild(span);
             transcriptDiv.appendChild(document.createTextNode(" "));
         });
-
         async function translate(word) {
             const lang = document.getElementById('lang-select').value;
-            const resWord = document.getElementById('res-word');
-            const resTrans = document.getElementById('res-trans');
-
-            resWord.innerText = word;
-            resTrans.innerText = "...";
-
+            document.getElementById('res-word').innerText = `Translating: ${word}`;
             try {
                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(word)}`;
                 const response = await fetch(url);
                 const data = await response.json();
-                resTrans.innerText = data[0][0][0];
+                document.getElementById('res-trans').innerText = data[0][0][0];
             } catch (e) {
-                resTrans.innerText = "Error";
+                document.getElementById('res-trans').innerText = "Translation Error";
             }
         }
     </script>
