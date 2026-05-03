@@ -6,81 +6,118 @@
     <title>Smart Fella Admin OS</title>
     <style>
         :root { --ios-bg: #f2f2f7; --ios-accent: #007aff; --glass: rgba(255, 255, 255, 0.7); }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--ios-bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--ios-bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #000; }
         
-        #login-screen { position: fixed; inset: 0; background: var(--ios-bg); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        #login-screen { position: fixed; inset: 0; background: var(--ios-bg); z-index: 100; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
         .card { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 40px; border-radius: 40px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.3); }
         
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 15px; border: none; background: rgba(0,0,0,0.05); font-size: 16px; outline: none; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--ios-accent); color: white; font-weight: 600; cursor: pointer; }
+        .btn-primary { width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--ios-accent); color: white; font-weight: 600; cursor: pointer; font-size: 16px; }
         
-        #dashboard { display: none; width: 100%; max-width: 600px; padding: 20px; box-sizing: border-box; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        #dashboard { display: none; width: 100%; max-width: 600px; padding: 20px; box-sizing: border-box; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .update-btn { background: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; color: var(--ios-accent); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; }
+        .update-btn:active { transform: scale(0.95); background: #eee; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .stat-box { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .stat-box span { font-size: 12px; color: #8e8e93; text-transform: uppercase; font-weight: bold; }
-        .stat-box h2 { margin: 5px 0 0; font-size: 28px; }
+        .stat-box span { font-size: 12px; color: #8e8e93; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
+        .stat-box h2 { margin: 5px 0 0; font-size: 32px; letter-spacing: -1px; }
         
-        .user-list { background: white; border-radius: 25px; overflow: hidden; }
-        .user-row { padding: 15px 20px; border-bottom: 1px solid #f2f2f7; display: flex; justify-content: space-between; align-items: center; }
-        .user-info b { display: block; font-size: 16px; }
-        .user-info small { color: #8e8e93; }
-        .badge { background: #e9e9eb; padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+        .user-list { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .user-row { padding: 18px 20px; border-bottom: 1px solid #f2f2f7; display: flex; justify-content: space-between; align-items: center; }
+        .user-row:last-child { border-bottom: none; }
+        .user-info b { display: block; font-size: 17px; letter-spacing: -0.3px; }
+        .user-info small { color: #8e8e93; font-size: 13px; }
+        .badge { background: #e9e9eb; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #3a3a3c; }
+        
+        .empty-state { padding: 40px; text-align: center; color: #8e8e93; font-style: italic; }
+        #error-msg { color: #ff3b30; font-size: 12px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="card">
-            <h1 style="margin-top:0; letter-spacing:-1px;">Admin Login</h1>
-            <input type="text" id="username" placeholder="Username">
+            <h1 style="margin-top:0; letter-spacing:-1.5px; font-size: 32px;">Admin Login</h1>
+            <input type="text" id="username" placeholder="Username" spellcheck="false">
             <input type="password" id="password" placeholder="Password">
-            <button onclick="checkLogin()">Sign In</button>
+            <button class="btn-primary" onclick="checkLogin()">Sign In</button>
+            <div id="error-msg">Connection to server failed. Check your IP.</div>
         </div>
     </div>
 
     <div id="dashboard">
-        <h1 style="font-size: 34px; letter-spacing: -1px; margin-bottom: 25px;">Dashboard</h1>
+        <div class="header-row">
+            <h1 style="font-size: 34px; letter-spacing: -1px; margin: 0;">Overview</h1>
+            <button class="update-btn" onclick="fetchStats()">Update ↻</button>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-box"><span>Total Users</span><h2 id="t-users">0</h2></div>
-            <div class="stat-box"><span>Messages</span><h2 id="t-msgs">0</h2></div>
+            <div class="stat-box"><span>Total Msgs</span><h2 id="t-msgs">0</h2></div>
         </div>
-        <h2 style="font-size: 20px; margin-bottom: 15px;">Active Users</h2>
-        <div class="user-list" id="user-list"></div>
+
+        <h2 style="font-size: 22px; margin: 0 0 15px 5px; letter-spacing: -0.5px;">User Database</h2>
+        <div class="user-list" id="user-list">
+            <div class="empty-state">Loading user data...</div>
+        </div>
     </div>
 
     <script>
+        // Update this if your IP or Port ever changes
         const API_URL = "http://212.132.99.151:9152/api/stats";
 
         async function fetchStats() {
+            const btn = document.querySelector('.update-btn');
+            btn.innerText = "Updating...";
+            
             try {
                 const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("Server response error");
+                
                 const data = await response.json();
+                
                 document.getElementById('t-users').innerText = data.total_users;
                 document.getElementById('t-msgs').innerText = data.total_messages;
                 
                 const list = document.getElementById('user-list');
-                list.innerHTML = data.users.map(u => `
-                    <div class="user-row">
-                        <div class="user-info">
-                            <b>@${u.username || 'unknown'}</b>
-                            <small>ID: ${u.id}</small>
+                if (data.users.length === 0) {
+                    list.innerHTML = '<div class="empty-state">No users logged yet. Send a message to the bot!</div>';
+                } else {
+                    list.innerHTML = data.users.map(u => `
+                        <div class="user-row">
+                            <div class="user-info">
+                                <b>@${u.username || 'unknown_user'}</b>
+                                <small>ID: ${u.id}</small>
+                            </div>
+                            <span class="badge">${u.count} msgs</span>
                         </div>
-                        <span class="badge">${u.count} msgs</span>
-                    </div>
-                `).join('');
+                    `).join('');
+                }
+                document.getElementById('error-msg').style.display = 'none';
             } catch (e) {
                 console.error("Connection failed", e);
+                document.getElementById('error-msg').style.display = 'block';
+                document.getElementById('error-msg').innerText = "Bot Offline or API blocked.";
+            } finally {
+                setTimeout(() => { btn.innerText = "Update ↻"; }, 500);
             }
         }
 
         function checkLogin() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
+            
             if(u === 'root' && p === 'c00p00pay') {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                fetchStats();
-                setInterval(fetchStats, 10000); // Auto-refresh every 10s
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    fetchStats();
+                }, 500);
             } else {
                 alert('Invalid Credentials');
             }
