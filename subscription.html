@@ -3,72 +3,278 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Chatty Unlimited</title>
+  <title>Smart Fella Unlimited</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root{--blue:#168eea;--purple:#8b2be8;--text:#050505;--muted:#9397a3;--line:#d4d4d8;--card:#f1f1f1;--select:#eaf4ff;--radius:34px}
-    *{box-sizing:border-box} body{margin:0;background:#fff;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column}.screen{display:none;min-height:100vh;padding:18px 16px 20px}.screen.active{display:flex;flex-direction:column}.hero{flex:1;display:flex;flex-direction:column;align-items:center}.title{font-size:34px;font-weight:800;line-height:1.1;text-align:center;background:linear-gradient(90deg,#7951f6,#2767e8);-webkit-background-clip:text;color:transparent;margin:28px 0 8px}.subtitle{color:#8a8f9d;font-size:19px;text-align:center}.chart{width:100%;max-width:430px;height:330px;margin:28px 0 18px;position:relative}.bubble1000{position:absolute;left:0;top:24px;width:86px;height:86px;border-radius:50%;background:linear-gradient(135deg,#7d50ee,#a64eea);color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:800;font-size:26px}.bubble1000 span{font-size:15px}.axis{position:absolute;left:42px;right:10px;bottom:24px;height:1px;background:#e7e0cf}.axis:before{content:"";position:absolute;left:0;bottom:0;width:1px;height:205px;background:#eee}.day{position:absolute;bottom:0;color:#b6bdef;font-weight:800}.day.left{left:18px}.day.right{right:0}.label-chatty{position:absolute;right:96px;top:98px;color:#8c5bea;font-size:31px;font-weight:800}.label-self{position:absolute;right:12px;bottom:44px;color:#b7bdf0;font-weight:700}.reviews-title{align-self:flex-start;font-size:28px;font-weight:800;margin:8px 0 16px 22px}.reviews{display:flex;gap:12px;width:100%;overflow:hidden;padding:0 0 14px}.review{min-width:315px;background:#f4f4f5;border-radius:24px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.06);font-weight:600}.footer-links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:11px;font-weight:800;margin:12px 0 12px}.footer-links a{color:#777;text-decoration:none}.cta{width:100%;border:0;border-radius:28px;padding:17px 20px;color:#fff;background:linear-gradient(90deg,var(--blue),var(--purple));font-size:24px;font-weight:800;box-shadow:none}.pay-wrap{flex:1;display:flex;flex-direction:column;align-items:center}.sticker{font-size:88px;margin:8px 0 6px}.pay-title{font-size:36px;font-weight:800;text-align:center;background:linear-gradient(90deg,#7951f6,#2767e8);-webkit-background-clip:text;color:transparent;margin:0 0 18px}.benefits{width:100%;max-width:470px;margin:0 auto 16px}.benefit{display:flex;gap:12px;align-items:flex-start;font-size:20px;line-height:1.35;margin:11px 0}.check{color:#0c9df0;font-size:24px;font-weight:900}.plans{width:100%;max-width:470px;margin-top:auto}.plan{position:relative;border-radius:32px;background:#f1f1f1;padding:14px 22px;margin:8px 0;border:1.5px solid transparent;display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}.plan.selected{background:#eaf4ff;border-color:#1499ff}.rec{position:absolute;top:-12px;left:14px;background:#4f5ff0;color:#fff;border-radius:12px;padding:4px 9px;font-size:13px;font-weight:800}.plan-name{font-size:26px;font-weight:800}.plan-sub{font-size:18px;color:#969ba6}.price{text-align:left;min-width:132px}.old{color:#a7a7ad;text-decoration:line-through;font-size:19px}.new{color:#286df0;font-size:26px}.per{color:#286df0;font-size:14px}.discount{border:1.5px solid #ff3347;color:#ff3347;border-radius:20px;padding:8px 9px;font-size:19px;margin-left:8px}.price-row{display:flex;align-items:center}.loading{opacity:.65;pointer-events:none}.error{color:#ff3347;text-align:center;font-weight:700;margin:8px 0;min-height:20px}
+    :root {
+      --primary: #1a1a1a;
+      --accent: #d4af37; 
+      --accent-hover: #f1c40f;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --bg-light: #ffffff;
+      --card-bg: #fafafa;
+      --border-color: #e0e0e0;
+      --radius: 20px;
+      --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      background: var(--bg-light);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.4;
+    }
+
+    .screen { display: none; min-height: 100vh; padding: 24px 20px; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* Flashy Hero Section */
+    .hero {
+      text-align: center;
+      margin-top: 20px;
+      flex: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--gold-gradient);
+      color: #fff;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+    }
+
+    .title {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0 0 10px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 18px;
+      margin-bottom: 35px;
+    }
+
+    /* Why It Works Section */
+    .highlights {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .h-card {
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      text-align: left;
+      transition: transform 0.2s;
+    }
+
+    .h-card:active { transform: scale(0.98); }
+
+    .h-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .h-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Plan & CTA */
+    .plans { width: 100%; max-width: 400px; margin: 20px auto; }
+    
+    .plan {
+      border-radius: var(--radius);
+      background: var(--bg-light);
+      padding: 24px;
+      border: 2px solid var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .price-new {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-decoration: none;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .cta {
+      width: 100%;
+      border: none;
+      border-radius: 50px;
+      padding: 22px;
+      color: #fff;
+      background: var(--primary);
+      font-size: 18px;
+      font-weight: 700;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .error { color: #e74c3c; text-align: center; font-size: 13px; margin: 10px 0; min-height: 18px; }
+    .loading { opacity: 0.6; pointer-events: none; }
   </style>
 </head>
 <body>
+
+  <!-- Screen 1: The "Flashy" Value Prop -->
   <section id="intro" class="screen active">
     <div class="hero">
-      <h1 class="title">Выучите 1000+ фраз</h1>
-      <div class="subtitle">в первые 7 дней с Chatty Unlimited</div>
-      <div class="chart">
-        <div class="bubble1000">1000<span>фраз</span></div>
-        <svg viewBox="0 0 420 300" width="100%" height="100%" style="position:absolute;inset:0">
-          <path d="M42 276 C 130 275, 275 195, 392 14" fill="none" stroke="#8d5be9" stroke-width="4" stroke-linecap="round"/>
-          <path d="M366 16 L392 10 L398 36" fill="none" stroke="#8d5be9" stroke-width="4" stroke-linecap="round"/>
-          <path d="M42 276 C 160 260, 290 224, 386 199" fill="none" stroke="#b9c0ef" stroke-width="4" stroke-linecap="round"/>
-          <path d="M360 190 L386 199 L366 216" fill="none" stroke="#b9c0ef" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-        <div class="axis"></div><div class="day left">ДЕНЬ 0</div><div class="day right">ДЕНЬ 7</div>
-        <div class="label-chatty">Chatty</div><div class="label-self">самостоятельно</div>
+      <div class="badge">Artificial Intelligence 2.0</div>
+      <h1 class="title">Smart Fella</h1>
+      <p class="subtitle">Ваш личный ИИ-наставник нового поколения</p>
+      
+      <div class="highlights">
+        <div class="h-card">
+          <h3>⚡️ Метод погружения</h3>
+          <p>Общайтесь в 5 раз больше, чем на обычных курсах. Smart Fella имитирует реальную языковую среду 24/7.</p>
+        </div>
+        <div class="h-card">
+          <h3>🧠 Мгновенная коррекция</h3>
+          <p>Бот не просто слушает — он видит каждую ошибку и сразу объясняет, как сказать правильно и естественно.</p>
+        </div>
+        <div class="h-card">
+          <h3>💎 Дорогой уровень речи</h3>
+          <p>Мы обучаем вас не учебным фразам, а живому, современному языку успешных людей.</p>
+        </div>
       </div>
-      <div class="reviews-title">Что говорят ученики Chatty</div>
-      <div class="reviews"><div class="review">Топ! За 16 дней стала говорить увереннее 🎉</div><div class="review">Понравились разборы ошибок и голос.</div></div>
     </div>
-    <div class="footer-links"><a href="https://chattyenglishbot.com/terms.html" target="_blank">УСЛОВИЯ ПОЛЬЗОВАНИЯ</a><a href="https://chattyenglishbot.com/privacy.html" target="_blank">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</a></div>
-    <button class="cta" onclick="showPlans()">Посмотреть планы</button>
+
+    <div class="footer-links">
+      <a href="https://chattyenglishbot.com/terms.html" target="_blank">Terms</a>
+      <a href="https://chattyenglishbot.com/privacy.html" target="_blank">Privacy</a>
+    </div>
+    <button class="cta" onclick="showPlans()">Начать обучение</button>
   </section>
+
+  <!-- Screen 2: Subscription -->
   <section id="plans" class="screen">
-    <div class="pay-wrap">
-      <div class="sticker">💝</div><h1 class="pay-title">Chatty Unlimited</h1>
-      <div class="benefits">
-        <div class="benefit"><span class="check">☑</span><span>Безлимитные сообщения и аудио с Chatty</span></div>
-        <div class="benefit"><span class="check">☑</span><span>Разборы твоих ошибок, переводы и оценка произношения</span></div>
-        <div class="benefit"><span class="check">☑</span><span>Подписчики в 7.5 раз чаще повышают свой уровень немецкого</span></div>
-        <div class="benefit"><span class="check">☑</span><span>Можно отписаться в любой момент</span></div>
-      </div>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <h1 class="title" style="text-align:center;">Неограниченный доступ</h1>
+      <p class="subtitle" style="text-align:center;">Инвестируйте в свои знания без ограничений</p>
+
       <div class="plans">
-        <div class="plan selected" data-plan="monthly" onclick="selectPlan('monthly')"><div><div class="plan-name">Безлимит Месяц</div><div class="plan-sub">Месячная подписка</div></div><div class="price-row"><div class="price"><div class="old">300₽</div><div class="new">200₽</div><div class="per">в месяц</div></div><div class="discount">-33%</div></div></div>
-        <div class="plan" data-plan="yearly" onclick="selectPlan('yearly')"><div class="rec">Рекомендуем</div><div><div class="plan-name">Безлимит Год</div><div class="plan-sub">Годовая подписка</div></div><div class="price-row"><div class="price"><div class="old">2400₽</div><div class="new">200₽</div><div class="per">сейчас</div></div><div class="discount">-92%</div></div></div>
+        <div class="plan">
+          <div>
+            <div style="font-weight:800; font-size: 20px;">Месячный план</div>
+            <div style="color:var(--text-muted); font-size: 14px;">Все PRO-функции</div>
+          </div>
+          <div style="text-align:right">
+            <div style="text-decoration:line-through; color:var(--text-muted); font-size:14px;">300₽</div>
+            <div class="price-new">200₽</div>
+          </div>
+        </div>
         <div id="err" class="error"></div>
       </div>
     </div>
-    <div class="footer-links"><a href="https://chattyenglishbot.com/terms.html" target="_blank">УСЛОВИЯ ПОЛЬЗОВАНИЯ</a><a href="https://chattyenglishbot.com/privacy.html" target="_blank">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</a></div>
-    <button id="payBtn" class="cta" onclick="pay()">Продолжить</button>
+
+    <div class="footer-links">
+      <a href="#" onclick="event.preventDefault(); document.getElementById('plans').classList.remove('active'); document.getElementById('intro').classList.add('active');">← Назад</a>
+    </div>
+    <button id="payBtn" class="cta" onclick="pay()">Оплатить доступ</button>
   </section>
+
 <script>
-const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-if (tg) { tg.ready(); tg.expand(); }
-const API_BASE_URL = "http://212.132.99.151:9152";
-let selectedPlan = "monthly";
-function showPlans(){document.getElementById('intro').classList.remove('active');document.getElementById('plans').classList.add('active');}
-function selectPlan(plan){selectedPlan=plan;document.querySelectorAll('.plan').forEach(p=>p.classList.toggle('selected',p.dataset.plan===plan));}
-function getUser(){const qs=new URLSearchParams(location.search);const tgUser=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user?tg.initDataUnsafe.user:{};return{user_id:qs.get('user_id')||tgUser.id,username:qs.get('username')||tgUser.username||''};}
-async function pay(){
-  const user=getUser(); const err=document.getElementById('err'); err.textContent='';
-  if(!user.user_id){err.textContent='Не удалось определить Telegram ID. Откройте страницу из бота.';return;}
-  const btn=document.getElementById('payBtn'); btn.classList.add('loading'); btn.textContent='Загрузка...';
-  try{
-    const r=await fetch(`${API_BASE_URL}/api/create-payment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.user_id,username:user.username,plan:selectedPlan})});
-    const data=await r.json(); if(!r.ok) throw new Error(data.error||'payment error');
-    if(tg && tg.openLink) tg.openLink(data.confirmation_url); else location.href=data.confirmation_url;
-  }catch(e){err.textContent='Ошибка открытия оплаты. Попробуйте позже.';console.error(e)}
-  finally{btn.classList.remove('loading');btn.textContent='Продолжить';}
-}
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  const API_BASE_URL = "http://212.132.99.151:9152";
+  const selectedPlan = "monthly";
+
+  function showPlans() {
+    document.getElementById('intro').classList.remove('active');
+    document.getElementById('plans').classList.add('active');
+  }
+
+  function getUser() {
+    const qs = new URLSearchParams(location.search);
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : {};
+    return {
+      user_id: qs.get('user_id') || tgUser.id,
+      username: qs.get('username') || tgUser.username || ''
+    };
+  }
+
+  async function pay() {
+    const user = getUser();
+    const err = document.getElementById('err');
+    const btn = document.getElementById('payBtn');
+    
+    err.textContent = '';
+    if (!user.user_id) {
+      err.textContent = 'Ошибка идентификации пользователя.';
+      return;
+    }
+
+    btn.classList.add('loading');
+    btn.textContent = 'Подключение...';
+
+    try {
+      const r = await fetch(`${API_BASE_URL}/api/create-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.user_id,
+          username: user.username,
+          plan: selectedPlan
+        })
+      });
+      
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'payment error');
+      
+      if (tg && tg.openLink) {
+        tg.openLink(data.confirmation_url);
+      } else {
+        location.href = data.confirmation_url;
+      }
+    } catch (e) {
+      err.textContent = 'Произошла ошибка. Попробуйте позже.';
+      console.error(e);
+    } finally {
+      btn.classList.remove('loading');
+      btn.textContent = 'Оплатить доступ';
+    }
+  }
 </script>
 </body>
 </html>
