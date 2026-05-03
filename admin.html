@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Fella | Admin OS</title>
+    <style>
+        :root {
+            --ios-bg: #f2f2f7;
+            --ios-accent: #007aff;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-main: #000000;
+            --text-sec: #8e8e93;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: var(--ios-bg);
+            margin: 0;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Login Overlay */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--ios-bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 40px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .login-card h1 { font-size: 28px; margin-bottom: 30px; letter-spacing: -0.5px; }
+
+        input {
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 18px;
+            border: none;
+            background: rgba(0,0,0,0.05);
+            font-size: 17px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            border-radius: 18px;
+            border: none;
+            background: var(--ios-accent);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:active { opacity: 0.7; }
+
+        /* Dashboard */
+        #dashboard {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .section-title { font-size: 34px; font-weight: 700; margin: 20px 0; letter-spacing: -1px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .stat-card span { color: var(--text-sec); font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        .stat-card h2 { margin: 8px 0 0; font-size: 28px; }
+
+        .user-list {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .user-row {
+            padding: 18px 25px;
+            border-bottom: 1px solid #f2f2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-row:last-child { border: none; }
+        .user-info div { font-weight: 600; font-size: 17px; }
+        .user-info span { color: var(--text-sec); font-size: 14px; }
+        .user-stats { text-align: right; }
+        .badge { background: #e9e9eb; padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <h1>Admin Login</h1>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="checkLogin()">Sign In</button>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <h1 class="section-title">Overview</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>Total Users</span>
+                <h2 id="total-users">1,284</h2>
+            </div>
+            <div class="stat-card">
+                <span>Msgs Today</span>
+                <h2>8.4k</h2>
+            </div>
+            <div class="stat-card">
+                <span>Avg Accuracy</span>
+                <h2>74%</h2>
+            </div>
+        </div>
+
+        <h2 style="font-size: 22px; margin-bottom: 15px;">User Database</h2>
+        <div class="user-list" id="user-list">
+            <!-- Simulated User Data -->
+            <div class="user-row">
+                <div class="user-info">
+                    <div>@john_doe</div>
+                    <span>ID: 5829304</span>
+                </div>
+                <div class="user-stats">
+                    <span class="badge">142 msgs</span>
+                </div>
+            </div>
+            <div class="user-row">
+                <div class="user-info">
+                    <div>@alice_wonder</div>
+                    <span>ID: 1093482</span>
+                </div>
+                <div class="user-stats">
+                    <span class="badge">89 msgs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if(u === 'root' && p === 'c00p00pay') {
+                document.getElementById('login-screen').style.transform = 'translateY(-100%)';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                }, 600);
+            } else {
+                alert('Access Denied');
+            }
+        }
+    </script>
+</body>
+</html>
