@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Fella Renewal</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root{--tg-theme-bg-color:#fff;--tg-theme-text-color:#000;--tg-theme-button-color:#007aff;--tg-theme-button-text-color:#fff;--tg-theme-hint-color:#8e8e93}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background-color:var(--tg-theme-bg-color);color:var(--tg-theme-text-color);margin:0;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center}
+        .card{background:#f2f2f7;border-radius:24px;padding:24px;width:100%;box-sizing:border-box;margin-top:20px;border:2px solid var(--tg-theme-button-color)}
+        .price{font-size:32px;font-weight:800;margin:10px 0}
+        .features{text-align:left;margin:20px 0;font-size:15px;line-height:1.6}
+        .btn{background-color:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color);border:none;border-radius:16px;padding:18px;width:100%;font-size:17px;font-weight:700;cursor:pointer;margin-top:10px}
+        h2{margin-bottom:5px}
+    </style>
+</head>
+<body>
+    <h2>Продление подписки</h2>
+    <p style="color:var(--tg-theme-hint-color)">Выберите ваш тарифный план</p>
+    <div class="card">
+        <h3 style="margin:0;color:var(--tg-theme-button-color)">UNLIMITED ACCESS</h3>
+        <div class="price">490 ₽ <span style="font-size:16px;font-weight:400;color:var(--tg-theme-hint-color)">/ месяц</span></div>
+        <div class="features">
+            ✅ Безлимитные сообщения<br>
+            ✅ Оценка произношения<br>
+            ✅ Разбор каждой ошибки<br>
+            ✅ Объяснения грамматики
+        </div>
+        <button class="btn" id="pay-btn">Продлить подписку</button>
+    </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+        const username = urlParams.get('username');
+
+        document.getElementById('pay-btn').onclick = async () => {
+            const btn = document.getElementById('pay-btn');
+            btn.disabled = true;
+            btn.innerText = "Загрузка...";
+            try {
+                const res = await fetch('http://212.132.99.151:9152/api/create-payment', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: userId, username: username})
+                });
+                const data = await res.json();
+                if (data.confirmation_url) {
+                    tg.openLink(data.confirmation_url);
+                    tg.close();
+                }
+            } catch (e) {
+                alert("Ошибка платежа. Попробуйте позже.");
+                btn.disabled = false;
+                btn.innerText = "Продлить подписку";
+            }
+        };
+    </script>
+</body>
+</html>
