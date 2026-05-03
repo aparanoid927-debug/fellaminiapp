@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #000000);
+            --sec-bg: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            --hint: var(--tg-theme-hint-color, #999999);
+        }
+        body { font-family: sans-serif; padding: 15px; background: var(--bg); color: var(--text); margin: 0; }
+        #transcript { line-height: 1.6; margin-bottom: 100px; font-size: 1.1em; }
+        .word { cursor: pointer; display: inline-block; padding: 2px 4px; border-radius: 4px; }
+        .word:active { background: var(--sec-bg); }
+        
+        #controls { position: sticky; top: 0; background: var(--bg); padding-bottom: 10px; border-bottom: 1px solid var(--sec-bg); margin-bottom: 15px; }
+        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--hint); background: var(--sec-bg); color: var(--text); }
+        
+        #translation-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; background: var(--sec-bg); border-top: 1px solid var(--hint); box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        #res-word { font-weight: bold; color: var(--hint); display: block; margin-bottom: 5px; font-size: 0.9em; }
+        #res-trans { font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <select id="lang-select">
+            <option value="ru">Russian</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="de">German</option>
+        </select>
+    </div>
+
+    <div id="transcript"></div>
+
+    <div id="translation-footer">
+        <span id="res-word">Tap a word...</span>
+        <div id="res-trans">—</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const rawText = urlParams.get('text') || "";
+        const transcriptDiv = document.getElementById('transcript');
+
+        // Split text into interactive words
+        rawText.split(/\s+/).forEach(word => {
+            const cleanWord = word.replace(/[.,!?;:()]/g, "");
+            const span = document.createElement('span');
+            span.className = 'word';
+            span.innerText = word;
+            span.onclick = () => translate(cleanWord);
+            transcriptDiv.appendChild(span);
+            transcriptDiv.appendChild(document.createTextNode(" "));
+        });
+
+        async function translate(word) {
+            const lang = document.getElementById('lang-select').value;
+            const resWord = document.getElementById('res-word');
+            const resTrans = document.getElementById('res-trans');
+
+            resWord.innerText = word;
+            resTrans.innerText = "...";
+
+            try {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(word)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                resTrans.innerText = data[0][0][0];
+            } catch (e) {
+                resTrans.innerText = "Error";
+            }
+        }
+    </script>
+</body>
+</html>
