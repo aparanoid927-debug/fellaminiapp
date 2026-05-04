@@ -268,33 +268,25 @@ async function pay() {
     btn.textContent = 'Подключение...';
 
     try {
-        const r = await fetch(`${API_BASE_URL}/api/create-payment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: user.user_id,
-                username: user.username,
-                plan: selectedPlan
-            })
-        });
-        
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || 'payment error');
-        
-        // Use Telegram's native link opener if available, otherwise standard redirect[cite: 8, 9]
-        if (tg && tg.openLink) {
-            tg.openLink(data.confirmation_url);
-            // Optionally redirect the current Mini App view to return.html to wait
-            window.location.href = "return.html?status=pending";
-        } else {
-            location.href = data.confirmation_url;
-        }
+      const r = await fetch(`${API_BASE_URL}/api/create-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.user_id, username: user.username, plan: selectedPlan })
+      });
+      
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      
+      // КРИТИЧЕСКИ ВАЖНО: Сохраняем ID платежа для return.html
+      localStorage.setItem('last_payment_id', data.payment_id);
+      
+      if (window.Telegram.WebApp.openLink) {
+        window.Telegram.WebApp.openLink(data.confirmation_url);
+      } else {
+        location.href = data.confirmation_url;
+      }
     } catch (e) {
-        err.textContent = 'Произошла ошибка. Попробуйте позже.';
-        console.error(e);
-    } finally {
-        btn.classList.remove('loading');
-        btn.textContent = 'Оплатить доступ';
+      err.textContent = 'Ошибка. Попробуйте еще раз.';
     }
 }
 </script>
