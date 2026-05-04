@@ -40,22 +40,19 @@
             const btn = document.getElementById('pay-btn');
             btn.disabled = true;
             btn.innerText = "Загрузка...";
-            try {
-                const res = await fetch('https://212.132.99.151:9152/api/create-payment', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user_id: userId, username: username})
-                });
-                const data = await res.json();
-                if (data.confirmation_url) {
-                    tg.openLink(data.confirmation_url);
-                    tg.close();
-                }
-            } catch (e) {
-                alert("Ошибка платежа. Попробуйте позже.");
-                btn.disabled = false;
-                btn.innerText = "Продлить подписку";
-            }
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'http://212.132.99.151:9152/api/create-payment-redirect';
+            form.style.display = 'none';
+            [['user_id', userId], ['username', username]].forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value || '';
+                form.appendChild(input);
+            });
+            document.body.appendChild(form);
+            form.submit();
         };
     </script>
 </body>
