@@ -41,7 +41,7 @@
             btn.disabled = true;
             btn.innerText = "Загрузка...";
             try {
-                const res = await fetch('http://212.132.99.151:9152/api/create-payment', {
+                const res = await fetch('https://212.132.99.151:9152/api/create-payment', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({user_id: userId, username: username})
