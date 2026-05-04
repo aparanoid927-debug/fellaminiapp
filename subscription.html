@@ -233,7 +233,7 @@
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   if (tg) { tg.ready(); tg.expand(); }
 
-  const API_BASE_URL = "https://212.132.99.151:9152";
+  const API_BASE_URL = "http://212.132.99.151:9152";
   const selectedPlan = "monthly";
 
   function showPlans() {
@@ -267,19 +267,12 @@ async function pay() {
     btn.classList.add('loading');
     btn.textContent = 'Подключение...';
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://212.132.99.151:9152/api/create-payment-redirect';
-    form.style.display = 'none';
-    [['user_id', user.user_id], ['username', user.username], ['plan', selectedPlan]].forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = name;
-      input.value = value || '';
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
+    const payUrl = `${API_BASE_URL}/api/create-payment-redirect?user_id=${encodeURIComponent(user.user_id)}&username=${encodeURIComponent(user.username || '')}&plan=${encodeURIComponent(selectedPlan)}`;
+    if (tg && tg.openLink) {
+      tg.openLink(payUrl);
+    } else {
+      location.href = payUrl;
+    }
 }
 </script>
 </body>
