@@ -269,7 +269,7 @@ async function pay() {
 
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = 'http://212.132.99.151:9152/api/create-payment-redirect';
+    form.action = 'https://212.132.99.151:9152/api/create-payment-redirect';
     form.style.display = 'none';
     [['user_id', user.user_id], ['username', user.username], ['plan', selectedPlan]].forEach(([name, value]) => {
       const input = document.createElement('input');
